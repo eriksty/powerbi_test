@@ -1,0 +1,50 @@
+CREATE TABLE [DimTempo](
+      [Data] [smalldatetime] NOT NULL Primary Key,
+      [Ano] [smallint] NOT NULL,
+      [DataCurta] [char](10) NOT NULL,
+      [DiaSemana] [varchar](15) NOT NULL,
+      [DiaMes] [smallint] NOT NULL,
+      [MesNome] [varchar](10) NOT NULL,
+      [MesNumero] [smallint] NOT NULL,
+      [Trimestre] [smallint] NOT NULL,
+      [Semestre] [smallint] NOT NULL
+)
+GO
+ 
+SET LANGUAGE Brazilian
+ 
+Set nocount ON
+DECLARE @Ano smallint
+DECLARE @Data smalldatetime
+DECLARE @DataIni smalldatetime
+DECLARE @DataFim smalldatetime
+DECLARE @DataCurta char(10)
+DECLARE @DiaSemana varchar(15)
+DECLARE @DiaMes smallint
+DECLARE @MesNome varchar(10)
+DECLARE @MesNumero smallint
+DECLARE @Trimestre smallint
+DECLARE @Semestre smallint
+ 
+SET @DataIni='01/01/2005'
+SET @DataFim='31/12/2020'
+ 
+SET @Data=@DataIni
+While @Data<=@DataFim
+Begin
+     Set @DataCurta = convert(char(10), @Data, 103)
+     Set @DiaSemana = datename(weekday,@Data)
+     Set @DiaMes = day(@Data)
+     Set @MesNome = datename(month,@Data)
+     Set @MesNumero = month(@Data)
+     Set @Trimestre = DATEPART(quarter,@Data)
+     Select @Semestre= Case
+          when @MesNumero in (1,2,3,4,5,6) then 1
+          when @MesNumero in (7,8,9,10,11,12) then 2
+     End
+     Set @Ano = YEAR(@Data)
+     INSERT INTO DimTempo values(@Data, @Ano, @DataCurta, @DiaSemana, @DiaMes, @MesNome, @MesNumero, @Trimestre, @Semestre)
+ 
+     Set @Data=dateadd(day,1,@Data)
+End
+Set nocount OFF
